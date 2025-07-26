@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-    frontend:
+  frontend:
     image: node:18-alpine
     working_dir: /app
     volumes:
@@ -23,7 +23,6 @@ services:
     depends_on:
       - backend
 
-
   backend:
     image: node:18-alpine
     working_dir: /app
@@ -38,10 +37,12 @@ services:
       - |
         npm install -g pnpm
         pnpm install
+        pnpm add -D typescript
+        pnpm exec tsc --noEmit
         pnpm run prestart:prod
         pnpm run start:prod
     expose:
-      - "4000"  # ⬅ internal use only
+      - "4000"
     depends_on:
       - mongo
 

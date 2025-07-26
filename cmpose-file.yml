@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: node:18-alpine
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NODE_OPTIONS=--openssl-legacy-provider
+    command:
+      - sh
+      - -c
+      - |
+        npm install -g pnpm && \
+        pnpm install && \
+        pnpm build && \
+        pnpm start
+    depends_on:
+      - backend
+
+  backend:
+    image: node:18-alpine
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - NODE_OPTIONS=--openssl-legacy-provider
+    command:
+      - sh
+      - -c
+      - |
+        npm install -g pnpm && \
+        pnpm install && \
+        pnpm build && \
+        pnpm start:prod
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo:/data/db
+
+volumes:
+  mongo-data:

@@ -1,21 +1,43 @@
-- name: Install and Run Fullstack App with Docker Compose 
+- name: Install and Run Fullstack App with Docker Compose
   hosts: localhost
   become: true
-
   vars:
     project_dir: /var/lib/jenkins/workspace/nestjs-project
 
   tasks:
-    - name: Install Docker and Docker Compose
+    - name: Install required packages
       apt:
         name:
-          - docker.io
-          - docker-compose
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
         state: present
-        update_cache: yes
+        update_cache: true
 
-    - name: Start Docker service
-      systemd:
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Install Docker Engine and Compose plugin
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+        update_cache: true
+
+    - name: Ensure Docker service is running
+      service:
         name: docker
         state: started
         enabled: true

@@ -1,0 +1,26 @@
+- name: Install and Run Fullstack App with Docker Compose 
+  hosts: localhost
+  become: true
+
+  vars:
+    project_dir: /var/lib/jenkins/workspace/nestjs-project
+
+  tasks:
+    - name: Install Docker and Docker Compose
+      apt:
+        name:
+          - docker.io
+          - docker-compose
+        state: present
+        update_cache: yes
+
+    - name: Start Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Run Docker Compose
+      command: docker-compose up -d
+      args:
+        chdir: "{{ project_dir }}"

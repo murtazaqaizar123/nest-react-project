@@ -1,7 +1,7 @@
 {
   "name": "blog-backend",
   "version": "0.0.0",
-  "description": "The backend API for a project build with Nest.js and React",
+  "description": "The backend API for a project built with Nest.js and React",
   "author": "Olususi Oluyemi",
   "license": "MIT",
   "scripts": {
@@ -28,8 +28,7 @@
     "mongoose": "^5.4.0",
     "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.2",
-    "rxjs": "^6.2.2",
-    "typescript": "^3.0.1"
+    "rxjs": "^6.2.2"
   },
   "devDependencies": {
     "@nestjs/testing": "^5.1.0",
@@ -47,7 +46,8 @@
     "ts-loader": "^4.4.2",
     "ts-node": "^7.0.1",
     "tsconfig-paths": "^3.5.0",
-    "tslint": "5.11.0"
+    "tslint": "5.11.0",
+    "typescript": "^3.0.1"
   },
   "jest": {
     "moduleFileExtensions": [

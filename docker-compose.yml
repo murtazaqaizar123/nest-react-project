@@ -6,8 +6,6 @@ services:
     working_dir: /app
     volumes:
       - ./blog-frontend:/app
-    ports:
-      - "3000:3000"
     environment:
       - NODE_ENV=production
       - NODE_OPTIONS=--openssl-legacy-provider
@@ -19,6 +17,8 @@ services:
         pnpm install
         pnpm build
         pnpm exec serve -s build -l 3000
+    expose:
+      - "3000"  # ⬅ internal use only
     depends_on:
       - backend
 
@@ -27,8 +27,6 @@ services:
     working_dir: /app
     volumes:
       - ./blog-backend:/app
-    ports:
-      - "4000:4000"
     environment:
       - NODE_ENV=production
       - NODE_OPTIONS=--openssl-legacy-provider
@@ -40,15 +38,17 @@ services:
         pnpm install
         pnpm run prestart:prod
         pnpm run start:prod
+    expose:
+      - "4000"  # ⬅ internal use only
     depends_on:
       - mongo
 
   mongo:
     image: mongo:6
-    ports:
-      - "27017:27017"
     volumes:
       - mongo-data:/data/db
+    expose:
+      - "27017"
 
   nginx:
     image: nginx:1.24

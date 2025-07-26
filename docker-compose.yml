@@ -1,55 +1,45 @@
-version: '3.8'
+- name: Install and Configure Nginx for Reverse Proxy
+  hosts: localhost
+  become: true
 
-services:
-  frontend:
-    image: node:18-alpine
-    working_dir: /app
-    volumes:
-      - ./blog-frontend:/app
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - NODE_OPTIONS=--openssl-legacy-provider
-    command:
-      - /bin/sh
-      - -c
-      - |
-        npm install -g pnpm
-        pnpm install
-        pnpm add tslib serve -D
-        pnpm build
-        pnpm exec serve -s build -l 3000
-    depends_on:
-      - backend
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
 
-  backend:
-    image: node:18-alpine
-    working_dir: /app
-    volumes:
-      - ./blog-backend:/app
-    ports:
-      - "4000:4000"
-    environment:
-      - NODE_ENV=production
-      - NODE_OPTIONS=--openssl-legacy-provider
-    command:
-      - /bin/sh
-      - -c
-      - |
-        npm install -g pnpm
-        pnpm install
-        pnpm run prestart:prod
-        pnpm run start:prod
-    depends_on:
-      - mongo
+    - name: Configure Nginx
+      copy:
+        content: |
+          server {
+              listen 80;
 
-  mongo:
-    image: mongo:6
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
+              location / {
+                  proxy_pass http://frontend:3000;
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection 'upgrade';
+                  proxy_set_header Host $host;
+                  proxy_cache_bypass $http_upgrade;
+              }
 
-volumes:
-  mongo-data:
+              location /api/ {
+                  rewrite ^/api/?(.*)$ /$1 break;
+                  proxy_pass http://backend:4000;
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection 'upgrade';
+                  proxy_set_header Host $host;
+                  proxy_cache_bypass $http_upgrade;
+              }
+          }
+        dest: /etc/nginx/sites-available/default
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted

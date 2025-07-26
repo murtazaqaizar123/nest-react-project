@@ -21,6 +21,6 @@
         enabled: true
 
     - name: Run Docker Compose
-      command: compose-file up -d
+      command: docker compose up -d
       args:
         chdir: "{{ project_dir }}"

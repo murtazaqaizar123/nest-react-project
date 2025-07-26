@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  frontend:
+    frontend:
     image: node:18-alpine
     working_dir: /app
     volumes:
@@ -15,12 +15,14 @@ services:
       - |
         npm install -g pnpm
         pnpm install
+        pnpm add tslib serve -D
         pnpm build
         pnpm exec serve -s build -l 3000
     expose:
-      - "3000"  # ⬅ internal use only
+      - "3000"
     depends_on:
       - backend
+
 
   backend:
     image: node:18-alpine
